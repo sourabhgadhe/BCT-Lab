@@ -1,0 +1,212 @@
+<--------------- Student Data ---------------->
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+contract studentManagement {
+    
+    struct StudentRecord{
+        uint256 id;
+        string name;
+        string department;
+    }
+
+    StudentRecord[] records;
+
+    function addRecord(uint _id,string memory _name,string memory _department) public {
+        records.push(StudentRecord(_id,_name,_department));
+    }
+
+    function getRecord(uint studentId) public view returns (string memory, string memory) {
+        for (uint i=0; i<records.length; i++) 
+        {
+            StudentRecord memory stud=records[i];
+            if (stud.id==studentId) {
+                return (stud.name,stud.department);
+            }
+        }
+        return ("Name not found", "Department not found");
+    }
+
+    function studentCount()public view returns (uint) {
+        return records.length;
+    }
+
+    fallback() external payable {
+        records.push(StudentRecord(7,"XYZ","Mech"));
+    }
+    receive() external payable { }
+}
+
+
+
+
+
+
+
+<--------------- Employee Data ---------------->
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+contract EmployeeManagement {
+    struct EmployeeData{
+        uint256 empId;
+        string name;
+        uint256 salary;
+        string designation;
+    }
+
+    EmployeeData[] employee;
+
+    function addRecords(uint256 id,string memory name,uint256 sal,string memory deg) public {
+        employee.push(EmployeeData(id,name,sal,deg));
+    }
+
+    function getEmployeeData(uint id)public view returns (string memory,uint,string memory){
+        for (uint i=0; i<employee.length; i++) 
+        {
+            EmployeeData memory emp=employee[i];
+            if (emp.empId==id) {
+                return (emp.name,emp.salary,emp.designation);
+            }
+        }
+        return ("Name not found",0,"Designation not found");
+    }
+
+    function employeeCount() public view returns(uint) {
+        return employee.length;
+    }
+
+
+    fallback() external payable {
+        employee.push(EmployeeData(101,"Sourabh",100000,"B.E"));
+    }
+    receive() external payable { }
+}
+
+
+
+
+
+
+<--------------- Customer Data ---------------->
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+contract CustomerManagement {
+    struct customerData{
+        uint256 customerId;
+        string name;
+        uint256 age;
+        string email;
+    }
+
+    customerData[] customer;
+
+    function addRecords(uint256 id,string memory name,uint256 age, string memory email) public {
+        customer.push(customerData(id,name,age,email));
+    }
+
+    function getData(uint256 id) public view returns (string memory,uint256,string memory) {
+        for (uint i=0; i<customer.length; i++) 
+        {
+            customerData memory cust=customer[i];
+            if (cust.customerId==id) {
+                return (cust.name,cust.age,cust.email);
+            }
+            
+        }
+        return ("Name not found",0,"Email not found");
+    }
+
+    fallback() external payable { }
+    receive() external payable { }
+}
+
+
+
+
+
+
+<--------------- Bank Account ---------------->
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity > 0.7.0;
+contract bank{
+    mapping (address=>uint) public user_account;
+    mapping (address=>bool) public user_exist;
+    
+    function create_account() public payable returns (string memory){
+        require(user_exist[msg.sender]==false,"Account exists");
+        user_exist[msg.sender]=true;
+        return "Account created";
+
+    }
+    function deposit(uint amount) public payable returns(string memory){
+        require(user_exist[msg.sender]==true,"Account does not exist");
+        require(amount>0,"Amount should be greater than zero");
+        user_account[msg.sender]+=amount;
+        return "Amount deoposited";
+    }
+    function withdraw(uint amount) public payable returns(string memory){
+        require(user_exist[msg.sender]==true,"Account does not");
+        require(amount>0,"Amount more than 0");
+        require(user_account[msg.sender]>=amount,"Insufficient balance");
+        user_account[msg.sender]-=amount;
+        return "Amount withdrawn";
+    }
+    function account_balance() public view returns(uint){
+        return user_account[msg.sender];
+    }
+    function account_exist() public  view returns(bool){
+        return user_exist[msg.sender];
+    }
+}
+
+
+
+
+
+
+<--------------- Product Inventory ---------------->
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ProductInventory {
+    address public owner;
+    mapping(string => uint256) public stock;
+
+    event ProductReceived(string product, uint256 quantity);
+    event ProductSold(string product, uint256 quantity);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function receiveProduct(string memory product, uint256 quantity) public onlyOwner {
+        stock[product] += quantity;
+        emit ProductReceived(product, quantity);
+    }
+
+    function sellProduct(string memory product, uint256 quantity) public onlyOwner {
+        require(stock[product] >= quantity, "Insufficient stock");
+        stock[product] -= quantity;
+        emit ProductSold(product, quantity);
+    }
+
+    function displayStock(string memory product) public view returns (uint256) {
+        return stock[product];
+    }
+}
